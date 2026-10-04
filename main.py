@@ -1,74 +1,73 @@
-import json
-import os
+tasks = []
 
-FILE_NAME = "tasks.json"
 
-def load_tasks():
-    if os.path.exists(FILE_NAME):
-        with open(FILE_NAME, "r") as file:
-            return json.load(file)
-    return []
+def show_menu():
+    print("\n------TO DO LIST------")
+    print("1. Add Task")
+    print("2. View Task")
+    print("3. Mark Task as done")
+    print("4. Delete Task")
+    print("5. Exit")
 
-def save_tasks(tasks):
-    with open(FILE_NAME, "w") as file:
-        json.dump(tasks, file, indent=4)
+def add_task():
+    task = input("Enter Task: ")
+    tasks.append({"task": task, "done": False})
+    print(f"Task: {task} is added!")
 
-def view_tasks(tasks):
+def view_task():
     if not tasks:
-        print("\n📭 Your Todo List is Empty!")
+        print("No Tasks Yet.")
         return
-    
-    print("\n--- Your Tasks ---")
+
+    print("Your Tasks: ")
     for index, task in enumerate(tasks, start=1):
-        print(f"{index}. {task}")
-    print("-" * 20)
+        status = "✅" if task['done'] else "❌"
+        print(f"{index}. {task['task']} [{status}]")
 
-def add_task(tasks):
-    task_text = input("\nEnter new Task: ").strip()
-    if task_text == "":
-        print("❌ Task can not be empty!")
-        return
-    tasks.append(task_text)
-    save_tasks(tasks)
-    print(f"✅ '{task_text}' successfully added!")
-
-def delete_task(tasks):
-    view_tasks(tasks)
+def mark_done():
+    view_task()
     if not tasks:
         return
     try:
-        choice = int(input("\nChoose the task you want to delte: "))
-        if 1 <= choice <= len(tasks):
-            removed = tasks.pop(choice - 1)
-            save_tasks(tasks)
-            print(f"🗑️ '{removed}' has been deleted.")
+        index = int(input("Enter task number to mark done.")) - 1
+        if 0 <= index < len(tasks):
+            tasks[index]["done"] = True
+            print("Marked as done.")
         else:
-            print("❌ You selected the wrong number")
+            print("Invalid Number.")
+
     except ValueError:
-        print("❌ Please enter a valid number")
+        print("Please enter a valid number.")
 
-def main():
-    tasks = load_tasks()
-    while True:
-        print("\n=== PYTHON TO-DO APP ===")
-        print("1. Tasks")
-        print("2. Add New Task")
-        print("3. Delete Task")
-        print("4. Exit App")
-        
-        choice = input("\nChoose a Option (1-4): ").strip()
-        
-        if choice == '1':
-            view_tasks(tasks)
-        elif choice == '2':
-            add_task(tasks)
-        elif choice == '3':
-            delete_task(tasks)
-        elif choice == '4':
-            print("\n👋 Good bye Take care.")
-            break
+def delete_task():
+    view_task()
+    if not tasks:
+        return
+
+    try:
+        index = int(input("Enter the task number you want to delete: ")) -1
+        if 0<= index < len(tasks):
+            removed = tasks.pop(index)
+            print(f"Deleted task: {removed['task']}")
         else:
-            print("❌ Invalid choice! Please choose between 1 to 4.")
+            print("Invalid Number.")
+    except ValueError:
+        print("Please enter a valid value.")
 
-if __name__ == "__main__":
-    main()
+
+while True:
+    show_menu()
+    choice = input("Choose an option (1-5): ")
+    if choice == '1':
+        add_task()
+    elif choice == '2':
+        view_task()
+    elif choice == '3':
+        mark_done()
+    elif choice == '4':
+        delete_task()
+    elif choice == '5':
+        print("Goodbye")
+        break
+    else:
+        print("Invalid choice. Try again")
